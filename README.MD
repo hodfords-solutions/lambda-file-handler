@@ -77,7 +77,17 @@ let fileHandler = new FileHandler(
 await fileHandler.handle();
 ```
 
-## Image Handler 🤖
+## Image Handler 🖼
+
+Image file processing, resizing, converting.
+Use case: 
+- Resize image to specific dimensions.
+- Convert image to webp/jpg format.
+- Generate thumbnails.
+- Keep original format/file and validate mime type.
+
+> **Note:** `ImageHandler` uses `sharp` to process images.
+> For HEIC files, use a lambda layer that supports this.
 
 #### Install
 
@@ -100,7 +110,16 @@ new ImageHandler(
 );
 ```
 
-## Audio Handler 🤖
+## Audio Handler 🔊
+
+Audio file processing, converting.
+Use case:
+- Convert audio to mp3/any format.
+- Encode audio files.
+- Keep original format/file and validate mime type.
+
+
+> **Note:** `AudioHandler` uses `fluent-ffmpeg` to process audio files.
 
 #### Install
 
@@ -120,7 +139,17 @@ new AudioHandler(
 );
 ```
 
-## Video Handler 🤖
+## Video Handler 📹
+
+Video file processing, resizing, converting, thumbnail generation.
+Use case:
+- Resize video to specific dimensions like HD, FHD,...
+- Convert video to mp4/any format.
+- Generate thumbnails.
+- Keep original format/file and validate mime type.
+
+> **Note:** `VideoHandler` uses `fluent-ffmpeg` to process video files.
+
 
 #### Install
 
