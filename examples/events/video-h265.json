@@ -1,0 +1,22 @@
+{
+    "Records": [
+        {
+            "EventSource": "aws:sns",
+            "EventVersion": "1.0",
+            "EventSubscriptionArn": "arn:aws:sns:eu-west-2:533267253460:hodfords-dev-s3-update:0d53ce74-9246-46a0-a46a-5775afa26916",
+            "Sns": {
+                "Type": "Notification",
+                "MessageId": "aed6f711-6305-503b-bcb1-a983afed0d1a",
+                "TopicArn": "arn:aws:sns:eu-west-2:533267253460:hodfords-dev-s3-update",
+                "Subject": "Amazon S3 Notification",
+                "Message": "{\"Records\":[{\"eventVersion\":\"2.1\",\"eventSource\":\"aws:s3\",\"awsRegion\":\"eu-west-2\",\"eventTime\":\"2024-04-12T05:46:16.523Z\",\"eventName\":\"ObjectCreated:Post\",\"userIdentity\":{\"principalId\":\"AWS:AIDAXYKJURDKFTNGCXBWV\"},\"requestParameters\":{\"sourceIPAddress\":\"203.198.148.50\"},\"responseElements\":{\"x-amz-request-id\":\"2A4YAMW2T5RGG5MV\",\"x-amz-id-2\":\"NLUMtCi6O9DbISNXDOMmsSCE1y/JJdWEgQMITk1Fg1AypiuHvYBuLU0bJB87A46sC237TGN/66CsPuKUPVBNn2yuMAhTkwYFHEBQaYXQSo0=\"},\"s3\":{\"s3SchemaVersion\":\"1.0\",\"configurationId\":\"sns\",\"bucket\":{\"name\":\"hodfords-lambda-testing\",\"ownerIdentity\":{\"principalId\":\"A28IZ65FY4KKY0\"},\"arn\":\"arn:aws:s3:::hodfords-lambda-testing\"},\"object\":{\"key\":\"prepares/videos/Big_Buck_Bunny_1080_10s_1MB.mp4\",\"size\":118094,\"eTag\":\"94893ff46a553a13e8642711b095f95b\",\"sequencer\":\"006618CAA5B65EAAA0\"}}}]}",
+                "Timestamp": "2024-04-12T05:46:16.959Z",
+                "SignatureVersion": "1",
+                "Signature": "U47tUgiDGaWWOWKcYSzBEOZF+VciF45OhJIqlvn6GQx7NKxG+ThvOD4jkRdhYQGgQZkdCIHO2b6oXWShH7Lx3p8MMzhWHT4ZuCeHwT4jDrhw3U+0AQnfw7RbJzysKiiB906axm5eDHyJnhixjZeODmsWMQBZtJr6uzBTV9qRgb8XJxybdpsbYGtaP86htlwNTPVLMvzxg+/9En2MJ4pfgFyaPFoGYrKRPtWi+T0wNhWmbpDR7u6Xks7LpGS4SfKM5S9wBWotFfmY+Zqus8IWAaDTb+cmyyiMD90NksZ0eoadRlvA4EGaGDbF804ZSDHdUAosCz3EfALJ+/sT7IqkiA==",
+                "SigningCertUrl": "https://sns.eu-west-2.amazonaws.com/SimpleNotificationService-60eadc530605d63b8e62a523676ef735.pem",
+                "UnsubscribeUrl": "https://sns.eu-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-2:533267253460:hodfords-dev-s3-update:0d53ce74-9246-46a0-a46a-5775afa26916",
+                "MessageAttributes": {}
+            }
+        }
+    ]
+}

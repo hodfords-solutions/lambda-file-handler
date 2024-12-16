@@ -1,0 +1,27 @@
+{
+  "name": "lambda-file-handler",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "start": "turbo start",
+    "lint": "eslint",
+    "check": "prettier --check \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "reset": "rm -rf **/*/dist **/*/node_modules node_modules"
+  },
+  "devDependencies": {
+    "@hodfords/nestjs-eslint-config": "10.0.9",
+    "@hodfords/nestjs-prettier-config": "10.0.1",
+    "@types/node": "^22.10.1",
+    "eslint": "9.11.1",
+    "lint-staged": "15.2.10",
+    "prettier": "3.3.3",
+    "turbo": "^2.3.0",
+    "typescript": "5.5.4"
+  },
+  "packageManager": "pnpm@9.14.3",
+  "engines": {
+    "node": ">=20"
+  }
+}

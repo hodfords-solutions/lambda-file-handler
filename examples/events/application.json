@@ -1,0 +1,21 @@
+{
+    "Records": [
+        {
+            "EventSource": "aws:sns",
+            "EventVersion": "1.0",
+            "EventSubscriptionArn": "not use",
+            "Sns": {
+                "Type": "Notification",
+                "MessageId": "b595825c-a28e-59d7-a3b6-d9b1dd571459",
+                "TopicArn": "arn:aws:sns:eu-west-2:11111111111111:hodfords-dev",
+                "Subject": "Amazon S3 Notification",
+                "Message": "{\n  \"Records\": [\n    {\n      \"eventVersion\": \"2.1\",\n      \"eventSource\": \"aws:s3\",\n      \"awsRegion\": \"eu-west-2\",\n      \"eventTime\": \"2022-11-16T13:55:38.460Z\",\n      \"eventName\": \"ObjectCreated:Post\",\n      \"userIdentity\": {\n        \"principalId\": \"A20YZSWDVUT7YP\"\n      },\n      \"requestParameters\": {\n        \"sourceIPAddress\": \"14.254.171.185\"\n      },\n      \"responseElements\": {\n        \"x-amz-request-id\": \"06QMZ198XHA8AJJ6\",\n        \"x-amz-id-2\": \"V08tuN0Q1jqiiupOCqpSUCBz5KCeZMe5jRr40bhpioIYUjZDszPmVO5Z3npqHAliljqsaNlKtyuuW6zct0HDx7FkvmEB92OY\"\n      },\n      \"s3\": {\n        \"s3SchemaVersion\": \"1.0\",\n        \"configurationId\": \"rynoo-sns\",\n        \"bucket\": {\n          \"name\": \"hodfords-lambda-testing\",\n          \"ownerIdentity\": {\n            \"principalId\": \"A20YZSWDVUT7YP\"\n          },\n          \"arn\": \"arn:aws:s3:::hodfords-lambda-testing\"\n        },\n        \"object\": {\n          \"key\": \"prepares/applications/11-01-2023/66acb7d3-3f39-42d7-ab5c-3cba0d19d88f/de5d3c80-6335-494a-984e-f7c6a1cda7bb.3ds\",\n          \"size\": 764176,\n          \"eTag\": \"0c481e87f2774b1bd41a0a70d9b70d11\",\n          \"sequencer\": \"006374EBD92AD83BC7\"\n        }\n      }\n    }\n  ]\n}",
+                "Timestamp": "2022-11-15T11:52:57.381Z",
+                "Signature": "ELN0ScUfRilbtan6rb2x9RdTfN2lIkngI7H2RWLWQi2GQugEMAe2Pde2CLb4lHGBRciSKvf+0ZLsyhbzTgmQDFTJ/uIx2s+3d3VUq0OW3xlULK1Yn2msLWe4woV2F3/cTehCKIc0mOGjNDb9O38Qb3hrz1216miZBNOK4br9i6AWgulE9/VSmrYe29AvViiOZCz7Rrn/gCwmZDtooG1DdM1F9PAWq1Av0oNMZNqMDhEGz7e3Fsg/ed5VzUD+f/ieIIoJll4Z/zOZioOlU4Y3l4PkYGyvl7gMoFmwNNJzw69KGuZE/jyDcy5To95p/KZ+tc75VouQ3NiA615CuBiRIg==",
+                "SigningCertUrl": "https://sns.eu-west-2.amazonaws.com/SimpleNotificationService-56e67fcb41f6fec09b0196692625d385.pem",
+                "UnsubscribeUrl": "https://sns.eu-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=not use",
+                "MessageAttributes": {}
+            }
+        }
+    ]
+}
