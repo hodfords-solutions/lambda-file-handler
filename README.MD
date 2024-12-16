@@ -1,57 +1,148 @@
-File handler
-- [x] Developer config
-  - event
-  - handler: (file) => Promise<void>
-- [x] Receive event from lambda
-- [x] Create temp folder for this session
-- [x] Get file from S3 to local
-- [x] Validation file
-- [x] Handle file (image, audio, video, ...)
-- [x] Upload file to S3
-- [x] Send event to SNS
-- [x] Delete temp folder
+<p align="center">
+  <a href="http://opensource.hodfords.uk" target="blank"><img src="https://opensource.hodfords.uk/img/logo.svg" width="320" alt="Nest Logo" /></a>
+</p>
 
-Image handler
-- [x] Developer config
-  - path: path to s3
-  - localPath: path to file in local
-  - sizes: { width, height }[]
-  - allowMimeType: string[]
-  - format: [ 'jpg', 'png', 'webp' ]
-  - keepOriginalFormat: boolean (default false)
-  - keepLargeFileIsOriginalFormat: boolean (default false)
-  - keepOriginalFile: boolean (default false)
-  - heicToJpg: boolean (default false)
-- [x] Get image details
-- [x] Validate image
-- [x] Resize image (keep ratio)
-- [x] Convert image to jpg
-- [x] Upload image to S3
+<p align="center">
+Lambda file uploader for AWS S3. Receive events from S3 -> SNS -> Lambda. Generate thumbnails, encode video/audio, resize video/image.
+</p>
 
-Audio handler
-- [x] Developer config
-  - path: path to s3
-  - localPath: path to file in local
-  - format: [ 'mp3', 'wav', 'ogg' ]
-  - keepOriginalFormat: boolean
-  - keepOriginalFile: boolean
-  - allowMimeType: string[]
-- [x] Get audio
-- [x] Convert audio to mp3
-- [x] Upload audio to S3
+## Installation 🤖
 
-Video handler
-- [x] Developer config
-    - path: path to s3
-    - localPath: path to file in local
-    - format: [ 'mp4', 'webm', 'ogg' ]
-    - allowMimeType: string[]
-    - keepOriginalFormat: boolean
-    - keepOriginalFile: boolean
-    - thumbnailSize: { width, height }
-    - sizes: { width, height }[]
-- [x] Get video
-- [x] Validate video
-- [x] Get thumbnail
-- [x] Convert video to mp4 (max full hd)
-- [x] Upload video to S3
+To begin using it, we first install the required dependencies.
+
+```
+npm install @hodfords/lfh-common @hodfords/lfh-file-handler
+```
+
+## Sample 🤖
+
+```typescript
+let event: { Records: SnsEvent[] } = JSON.parse(fs.readFileSync('./events/video.json', 'utf-8'));
+let fileHandler = new FileHandler(
+  {
+    awsConfig: {
+      region: 'xxx',
+      credentials: {
+        accessKeyId: 'xxx',
+        secretAccessKey: 'xxx'
+      }
+    },
+    pathFactory: (original: S3File, result: FileDetail) => {
+      return `test/${result.name}`;
+    },
+    aclFactory: (original: S3File, result: FileDetail) => {
+      return 'private';
+    },
+    metadataFactory: (original: S3File, result: FileDetail) => {
+      return {
+        'x-amz-meta-uuid': '14365123651274'
+      };
+    },
+    handler: (file: S3File) => {
+      if (file.local.fileType.startsWith('image')) {
+        return new ImageHandler(file, {
+          allowMimeType: ['images/*'],
+          dimensions: [
+            { width: 100, height: 100, keepAspectRatio: false },
+            { width: 200, height: 200, keepAspectRatio: true }
+          ],
+          format: ['webp'],
+          keepOriginalFormat: false
+        });
+      }
+
+      if (file.local.fileType.startsWith('audio')) {
+        return new AudioHandler(file, {
+          allowMimeType: ['audio/*'],
+          format: ['mp3'],
+          keepOriginalFormat: false,
+          keepOriginalFile: false
+        });
+      }
+
+      if (file.local.fileType.startsWith('video')) {
+        return new VideoHandler(file, {
+          dimensions: [{ height: 320, width: 240, keepAspectRatio: true }],
+          thumbnailDimension: { width: 240, height: 320, keepAspectRatio: true },
+          allowMimeType: ['video/*'],
+          format: ['mp4'],
+          keepOriginalFormat: false,
+          keepOriginalFile: false
+        });
+      }
+    }
+  },
+  event.Records
+);
+await fileHandler.handle();
+```
+
+## Image Handler 🤖
+
+#### Install
+
+```shell
+npm install @hodfords/lfh-image-handler
+```
+
+```typescript
+new ImageHandler(
+    file, 
+    {
+      allowMimeType: ['images/*'],
+      dimensions: [
+        { width: 100, height: 100, keepAspectRatio: false },
+        { width: 200, height: 200, keepAspectRatio: true }
+      ],
+      format: ['webp'],
+      keepOriginalFormat: false
+    }
+);
+```
+
+## Audio Handler 🤖
+
+#### Install
+
+```shell
+npm install @hodfords/lfh-audio-handler
+```
+
+```typescript
+new AudioHandler(
+    file, 
+    {
+      allowMimeType: ['audio/*'],
+      format: ['mp3'],
+      keepOriginalFormat: false,
+      keepOriginalFile: false
+    }
+);
+```
+
+## Video Handler 🤖
+
+#### Install
+
+```shell
+npm install @hodfords/lfh-video-handler
+```
+
+```typescript
+new VideoHandler(
+    file, 
+    {
+      dimensions: [{ height: 320, width: 240, keepAspectRatio: true }],
+      thumbnailDimension: { width: 240, height: 320, keepAspectRatio: true },
+      allowMimeType: ['video/*'],
+      format: ['mp4'],
+      keepOriginalFormat: false,
+      keepOriginalFile: false
+    }
+);
+```
+
+
+## License
+
+This project is licensed under the MIT License
