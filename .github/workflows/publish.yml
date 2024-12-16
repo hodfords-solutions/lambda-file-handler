@@ -18,6 +18,6 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Publish to npm
-        run: pnpm publish actions/setup-node@v4
+        run: pnpm publish --no-git-checks -r
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
