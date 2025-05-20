@@ -17,6 +17,7 @@ export type Dimension = {
     width: number;
     height: number;
     keepAspectRatio?: boolean;
+    ignoreWatermark?: boolean;
 };
 
 export type FileDetail = {

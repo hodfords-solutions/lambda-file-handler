@@ -1,4 +1,5 @@
 import { Dimension, FileDetail } from '@hodfords/lfh-common';
+import { WatermarkOptions } from '@hodfords/lfh-watermark';
 
 export type Config = {
     dimensions: Dimension[];
@@ -11,6 +12,7 @@ export type Config = {
     thumbnailFormat?: string;
     vcodec?: string;
     acodec?: string;
+    watermark?: WatermarkOptions;
 };
 
 export type VideoResult = FileDetail & {

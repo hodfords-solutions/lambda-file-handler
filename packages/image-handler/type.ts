@@ -1,4 +1,5 @@
 import { Dimension, FileDetail } from '@hodfords/lfh-common';
+import { WatermarkOptions } from '@hodfords/lfh-watermark';
 
 export type Config = {
     dimensions: Dimension[];
@@ -7,6 +8,7 @@ export type Config = {
     keepOriginalFormat?: boolean;
     keepLargeFileIsOriginalFormat?: boolean;
     keepOriginalFile?: boolean;
+    watermark?: WatermarkOptions;
 };
 
 export type ImageResult = FileDetail & {

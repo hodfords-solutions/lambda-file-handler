@@ -2,6 +2,7 @@ import { Config, ImageResult, VideoResult } from './type';
 import { FileHandlerInterface, getNewDimension, S3File, Dimension, FileDetail } from '@hodfords/lfh-common';
 import ffmpeg, { ffprobe } from 'fluent-ffmpeg';
 import * as fs from 'node:fs';
+import { createWatermark } from '@hodfords/lfh-watermark';
 
 export class VideoHandler implements FileHandlerInterface {
     private videos: VideoResult[] = [];
@@ -70,9 +71,17 @@ export class VideoHandler implements FileHandlerInterface {
 
     async resizeVideo(format: string, dimension: Dimension): Promise<VideoResult> {
         const name = this.getFileName(format, dimension);
-        await new Promise((resolve, reject) => {
-            const convertJob = ffmpeg(this.getCurrentLocalPath())
-                .size(`${dimension.width}x${dimension.height}`)
+        await new Promise(async (resolve, reject) => {
+            const convertJob = ffmpeg(this.getCurrentLocalPath());
+            let filters: any[] = [`[0:v]scale=${dimension.width}:${dimension.height}[scaled]`];
+            if (this.config.watermark) {
+                const watermarkPath = await createWatermark(this.config.watermark, dimension, this.file.local.tmpDir);
+                convertJob.input(watermarkPath);
+                const { x, y } = this.getOverlayPosition(this.config.watermark.position);
+                filters.push(`[scaled][1:v]overlay=${x}:${y}`);
+            }
+            convertJob
+                .complexFilter(filters)
                 .audioCodec(this.config.acodec || 'copy')
                 .on('error', (err) => reject(err))
                 .on('end', () => resolve(true))
@@ -93,6 +102,31 @@ export class VideoHandler implements FileHandlerInterface {
             isOriginal: false,
             type: 'video'
         };
+    }
+
+    getOverlayPosition(position: string) {
+        switch (position) {
+            case 'northwest':
+                return { x: 10, y: 10 };
+            case 'north':
+                return { x: '(main_w-overlay_w)/2', y: 10 };
+            case 'northeast':
+                return { x: 'main_w-overlay_w-10', y: 10 };
+            case 'west':
+                return { x: 10, y: '(main_h-overlay_h)/2' };
+            case 'center':
+                return { x: '(main_w-overlay_w)/2', y: '(main_h-overlay_h)/2' };
+            case 'east':
+                return { x: 'main_w-overlay_w-10', y: '(main_h-overlay_h)/2' };
+            case 'southwest':
+                return { x: 10, y: 'main_h-overlay_h-10' };
+            case 'south':
+                return { x: '(main_w-overlay_w)/2', y: 'main_h-overlay_h-10' };
+            case 'southeast':
+                return { x: 'main_w-overlay_w-10', y: 'main_h-overlay_h-10' };
+            default:
+                return { x: 10, y: 10 };
+        }
     }
 
     getActualDimension(dimension: Dimension): Dimension {

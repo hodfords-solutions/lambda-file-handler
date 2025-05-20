@@ -43,3 +43,5 @@ lerna-debug.log*
 /dist_raw
 dist
 **/dist/**
+
+examples/events/local/**

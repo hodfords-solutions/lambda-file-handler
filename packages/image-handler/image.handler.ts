@@ -1,6 +1,7 @@
-import sharp from 'sharp';
+import sharp, { OverlayOptions } from 'sharp';
 import { Config, ImageResult } from './type';
 import { FileHandlerInterface, getNewDimension, S3File, Dimension } from '@hodfords/lfh-common';
+import { getWatermark } from '@hodfords/lfh-watermark';
 
 export class ImageHandler implements FileHandlerInterface {
     private results: ImageResult[] = [];
@@ -33,7 +34,7 @@ export class ImageHandler implements FileHandlerInterface {
                     }))
                 )
                 .flat()
-                .map(({ dimension, format }) => this.resizeImage(format, dimension))
+                .map(async ({ dimension, format }) => this.resizeImage(format, dimension))
         );
     }
 
@@ -60,10 +61,30 @@ export class ImageHandler implements FileHandlerInterface {
         return dimension;
     }
 
+    async getOverlayOptions(dimension: Dimension): Promise<OverlayOptions> {
+        return {
+            input: await (await getWatermark(this.config.watermark, dimension)).toBuffer(),
+            gravity: this.config.watermark.position
+        };
+    }
+
+    async addWatermark(name: string, format: string, dimension: Dimension) {
+        if (!this.config.watermark || dimension.ignoreWatermark) {
+            return name;
+        }
+        let newName = this.getFileName(format, dimension);
+        const overlayOptions = await this.getOverlayOptions(dimension);
+        await sharp(`${this.file.local.tmpDir}/${name}.${format}`)
+            .composite([overlayOptions])
+            .toFile(`${this.file.local.tmpDir}/${newName}`);
+        return newName;
+    }
+
     async resizeImage(format: string, dimension: Dimension): Promise<ImageResult> {
         if (this.compareWithOriginal(format, dimension)) {
+            const name = await this.addWatermark(this.file.local.key, format, dimension);
             return {
-                name: this.file.local.key,
+                name: name,
                 dimension: { width: this.fileMetadata.width, height: this.fileMetadata.height },
                 format: this.file.rootExtension,
                 size: this.fileMetadata.size,
@@ -73,11 +94,13 @@ export class ImageHandler implements FileHandlerInterface {
         }
 
         const name = this.getFileName(format, dimension);
-        const image = await sharp(this.getCurrentLocalPath())
-            .resize({
-                ...dimension
-            })
-            .toFile(`${this.file.local.tmpDir}/${name}`);
+        const sharpInstance = sharp(this.getCurrentLocalPath()).resize({
+            ...dimension
+        });
+        if (!dimension.ignoreWatermark) {
+            sharpInstance.composite([await this.getOverlayOptions(dimension)]);
+        }
+        const image = await sharpInstance.toFile(`${this.file.local.tmpDir}/${name}`);
 
         return {
             name,

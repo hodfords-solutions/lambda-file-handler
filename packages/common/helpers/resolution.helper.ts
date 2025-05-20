@@ -24,3 +24,11 @@ export function getNewDimension(imageSize: Dimension, desiredSize: Dimension): D
 
     return { width: xAxis, height: yAxis };
 }
+
+export function scale(size: Dimension, scaleSize: `${number}%`): Dimension {
+    const scale = parseInt(scaleSize) / 100;
+    return {
+        width: Math.round(size.width * scale),
+        height: Math.round(size.height * scale)
+    };
+}

@@ -5,19 +5,22 @@ import { FileDetail, S3File } from '@hodfords/lfh-common';
 import { ImageHandler } from '@hodfords/lfh-image-handler';
 import { AudioHandler } from '@hodfords/lfh-audio-handler';
 import { VideoHandler } from '@hodfords/lfh-video-handler';
+import dotenv from 'dotenv';
 
+dotenv.config();
 async function main() {
-    let event: { Records: SnsEvent[] } = JSON.parse(fs.readFileSync('./events/video.json', 'utf-8'));
+    let event: { Records: SnsEvent[] } = JSON.parse(fs.readFileSync(process.env.EVENT_FILE, 'utf-8'));
     console.log('Start');
     let fileHandler = new FileHandler(
         {
             awsConfig: {
-                region: 'xxx',
+                region: process.env.AWS_REGION,
                 credentials: {
-                    accessKeyId: 'xxx',
-                    secretAccessKey: 'xxx'
+                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
                 }
             },
+            tmpDir: './tmp',
             pathFactory: (original: S3File, result: FileDetail) => {
                 return `test/${result.name}`;
             },
@@ -35,10 +38,23 @@ async function main() {
                         allowMimeType: ['images/*'],
                         dimensions: [
                             { width: 100, height: 100, keepAspectRatio: false },
-                            { width: 200, height: 200, keepAspectRatio: true }
+                            { width: 200, height: 200, keepAspectRatio: true },
+                            { width: 800, height: 500, keepAspectRatio: true }
                         ],
                         format: ['webp'],
-                        keepOriginalFormat: false
+                        keepOriginalFormat: true,
+                        watermark: {
+                            rotation: 0,
+                            position: 'southeast',
+                            size: {
+                                scale: '10%'
+                                // width: 100,
+                                // height: 100
+                            },
+                            image: {
+                                path: './assets/logo.webp'
+                            }
+                        }
                     });
                 }
 
@@ -58,7 +74,19 @@ async function main() {
                         allowMimeType: ['video/*'],
                         format: ['mp4'],
                         keepOriginalFormat: false,
-                        keepOriginalFile: false
+                        keepOriginalFile: false,
+                        watermark: {
+                            rotation: 0,
+                            position: 'southeast',
+                            size: {
+                                scale: '10%'
+                                // width: 100,
+                                // height: 100
+                            },
+                            image: {
+                                path: './assets/logo.webp'
+                            }
+                        }
                     });
                 }
             }

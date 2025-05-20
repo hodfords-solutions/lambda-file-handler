@@ -1,27 +1,22 @@
 {
-  "name": "@hodfords/lfh-image-handler",
-  "version": "0.0.3",
+  "name": "@hodfords/lfh-watermark",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node index.ts",
     "prepublish": "cp package.json dist/package.json && sed -i '' 's/dist\\/index.js/index.js/' dist/package.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github-hodfords:hodfords-solutions/lambda-file-handler.git"
   },
   "publishConfig": {
     "access": "public",
     "directory": "dist"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github-hodfords:hodfords-solutions/lambda-file-handler.git"
+  },
   "dependencies": {
     "@hodfords/lfh-common": "workspace:*",
-    "@hodfords/lfh-watermark": "workspace:*",
-    "sharp": "^0.33.5"
-  },
-  "devDependencies": {
-    "ts-node": "10.9.2"
+    "sharp": "^0.32.1"
   }
 }
