@@ -35,7 +35,8 @@ export class S3Helper {
         key: string,
         localPath: string,
         acl: string = 'private',
-        metadata: NodeJS.Dict<string> = {}
+        metadata: NodeJS.Dict<string> = {},
+        contentType: string = 'application/octet-stream',
     ) {
         const fileStream = fs.createReadStream(localPath);
         await this.client.send(
@@ -44,7 +45,8 @@ export class S3Helper {
                 Key: key,
                 ACL: acl as any,
                 Metadata: metadata,
-                Body: fileStream
+                Body: fileStream,
+                ContentType: contentType
             })
         );
     }

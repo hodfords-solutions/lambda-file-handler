@@ -1,6 +1,6 @@
 {
   "name": "@hodfords/lfh-image-handler",
-  "version": "0.0.3",
+  "version": "0.0.10",
   "description": "",
   "main": "dist/index.js",
   "scripts": {

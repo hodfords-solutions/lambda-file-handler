@@ -69,24 +69,27 @@ async function main() {
 
                 if (file.local.fileType.startsWith('video')) {
                     return new VideoHandler(file, {
-                        dimensions: [{ height: 320, width: 240, keepAspectRatio: true }],
+                        dimensions: [
+                            { height: 1080, width: 1920, keepAspectRatio: true },
+                        ],
                         thumbnailDimension: { width: 240, height: 320, keepAspectRatio: true },
                         allowMimeType: ['video/*'],
                         format: ['mp4'],
+                        acodec: 'aac',
                         keepOriginalFormat: false,
                         keepOriginalFile: false,
-                        watermark: {
-                            rotation: 0,
-                            position: 'southeast',
-                            size: {
-                                scale: '10%'
-                                // width: 100,
-                                // height: 100
-                            },
-                            image: {
-                                path: './assets/logo.webp'
-                            }
-                        }
+                        // watermark: {
+                        //     rotation: 0,
+                        //     position: 'southeast',
+                        //     size: {
+                        //         scale: '10%'
+                        //         // width: 100,
+                        //         // height: 100
+                        //     },
+                        //     image: {
+                        //         path: './assets/logo.webp'
+                        //     }
+                        // }
                     });
                 }
             }

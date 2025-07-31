@@ -93,11 +93,15 @@ export class FileHandler {
         await Promise.all(
             results.map(async (result) => {
                 let localPath = `${this.tmpDir}/${result.name}`;
+                let file = await fileTypeFromFile(localPath);
+                if (!file?.mime) {
+                    console.error('File not support.');
+                }
                 let key = this.config.pathFactory(this.file, result);
                 let acl = this.config.aclFactory ? this.config.aclFactory(this.file, result) : 'private';
                 let metadata = this.config.metadataFactory ? this.config.metadataFactory(this.file, result) : {};
                 result.path = key;
-                await S3Helper.instance().uploadFile(this.file.s3.bucket, key, localPath, acl, metadata);
+                await S3Helper.instance().uploadFile(this.file.s3.bucket, key, localPath, acl, metadata, file.mime);
             })
         );
     }

@@ -8,6 +8,7 @@ export class VideoHandler implements FileHandlerInterface {
     private videos: VideoResult[] = [];
     private thumbnail: ImageResult;
     private fileMetadata: ffmpeg.FfprobeData;
+    private encodedName: string;
 
     constructor(
         public file: S3File,
@@ -25,6 +26,7 @@ export class VideoHandler implements FileHandlerInterface {
     }
 
     async handle(): Promise<void> {
+        this.encodedName = await this.encodeVideo();
         this.fileMetadata = await this.getFileMetadata();
         const extensions = this.getExtensions();
         this.videos = await Promise.all(
@@ -52,7 +54,7 @@ export class VideoHandler implements FileHandlerInterface {
 
     async getFileMetadata(): Promise<ffmpeg.FfprobeData> {
         return new Promise((resolve, reject) => {
-            ffprobe(this.getCurrentLocalPath(), (err, data) => {
+            ffprobe(this.getEncodedLocalPath(), (err, data) => {
                 if (err) {
                     return reject(err);
                 }
@@ -69,27 +71,47 @@ export class VideoHandler implements FileHandlerInterface {
         }
     }
 
-    async resizeVideo(format: string, dimension: Dimension): Promise<VideoResult> {
-        const name = this.getFileName(format, dimension);
+    async encodeVideo(): Promise<string> {
+        const format = this.config.format ? this.config.format[0] : 'mp4';
+        const name = `${this.file.local.key}_encoded.${format}`;
         await new Promise(async (resolve, reject) => {
             const convertJob = ffmpeg(this.getCurrentLocalPath());
-            let filters: any[] = [`[0:v]scale=${dimension.width}:${dimension.height}[scaled]`];
-            if (this.config.watermark) {
-                const watermarkPath = await createWatermark(this.config.watermark, dimension, this.file.local.tmpDir);
-                convertJob.input(watermarkPath);
-                const { x, y } = this.getOverlayPosition(this.config.watermark.position);
-                filters.push(`[scaled][1:v]overlay=${x}:${y}`);
-            }
             convertJob
-                .complexFilter(filters)
+                .videoCodec(this.config.vcodec || 'libx264')
                 .audioCodec(this.config.acodec || 'copy')
                 .on('error', (err) => reject(err))
                 .on('end', () => resolve(true))
                 .format(format)
-                .output(`${this.file.local.tmpDir}/${name}`);
-            if (this.getVideoStream()['codec_name'] !== 'h264') {
-                convertJob.videoCodec(this.config.vcodec || 'libx264');
+                .output(`${this.file.local.tmpDir}/${name}`)
+                .run();
+        });
+
+        return name;
+    }
+
+    async resizeVideo(format: string, dimension: Dimension): Promise<VideoResult> {
+        const name = this.getFileName(format, dimension);
+        await new Promise(async (resolve, reject) => {
+            const convertJob = ffmpeg(this.getEncodedLocalPath());
+            let filters: any[] = [];
+            if (this.config?.watermark) {
+                const watermarkPath = await createWatermark(this.config.watermark, dimension, this.file.local.tmpDir);
+                convertJob.input(watermarkPath);
+                const { x, y } = this.getOverlayPosition(this.config.watermark.position);
+                filters.push(`[0:v]scale=${dimension.width}:${dimension.height}[scaled]`);
+                filters.push(`[scaled][1:v]overlay=${x}:${y}`);
+            } else {
+                filters.push(`[0:v]scale=${dimension.width}:${dimension.height}`);
             }
+            convertJob
+                .complexFilter(filters)
+                .on('error', (err) => reject(err))
+                .on('end', () => resolve(true))
+                .on('start', (commandLine) => {
+                    console.log(`Spawned Ffmpeg with command: ${commandLine}`);
+                })
+                .format(format)
+                .output(`${this.file.local.tmpDir}/${name}`);
             convertJob.run();
         });
 
@@ -142,7 +164,7 @@ export class VideoHandler implements FileHandlerInterface {
         let extension = this.config.thumbnailFormat || 'jpg';
         const thumbnailPath = `${this.file.local.tmpDir}/${this.file.local.key}.${extension}`;
         await new Promise((resolve, reject) => {
-            ffmpeg(this.getCurrentLocalPath())
+            ffmpeg(this.getEncodedLocalPath())
                 .on('end', () => resolve(true))
                 .on('error', (err) => reject(err))
                 .screenshots({
@@ -166,6 +188,10 @@ export class VideoHandler implements FileHandlerInterface {
 
     getCurrentLocalPath() {
         return `${this.file.local.tmpDir}/${this.file.local.key}.${this.file.rootExtension}`;
+    }
+
+    getEncodedLocalPath() {
+        return `${this.file.local.tmpDir}/${this.encodedName}`;
     }
 
     getFileName(format: string, dimension: Dimension) {

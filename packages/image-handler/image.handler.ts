@@ -56,7 +56,10 @@ export class ImageHandler implements FileHandlerInterface {
 
     getActualDimension(dimension: Dimension): Dimension {
         if (dimension.keepAspectRatio) {
-            return getNewDimension({ width: this.fileMetadata.width, height: this.fileMetadata.height }, dimension);
+            return {
+                ...dimension,
+                ...getNewDimension({ width: this.fileMetadata.width, height: this.fileMetadata.height }, dimension)
+            };
         }
         return dimension;
     }
@@ -69,7 +72,7 @@ export class ImageHandler implements FileHandlerInterface {
     }
 
     async addWatermark(name: string, format: string, dimension: Dimension) {
-        if (!this.config.watermark || dimension.ignoreWatermark) {
+        if (!this.config?.watermark || dimension.ignoreWatermark) {
             return name;
         }
         let newName = this.getFileName(format, dimension);
@@ -97,7 +100,7 @@ export class ImageHandler implements FileHandlerInterface {
         const sharpInstance = sharp(this.getCurrentLocalPath()).resize({
             ...dimension
         });
-        if (!dimension.ignoreWatermark) {
+        if (this.config.watermark && !dimension.ignoreWatermark) {
             sharpInstance.composite([await this.getOverlayOptions(dimension)]);
         }
         const image = await sharpInstance.toFile(`${this.file.local.tmpDir}/${name}`);

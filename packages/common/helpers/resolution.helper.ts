@@ -22,7 +22,11 @@ export function getNewDimension(imageSize: Dimension, desiredSize: Dimension): D
         }
     }
 
-    return { width: xAxis, height: yAxis };
+    return { width: makeEven(xAxis), height: makeEven(yAxis) };
+}
+
+export function makeEven(num: number): number {
+    return Math.round(num / 2) * 2;
 }
 
 export function scale(size: Dimension, scaleSize: `${number}%`): Dimension {
